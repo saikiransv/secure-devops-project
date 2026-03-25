@@ -1,0 +1,25 @@
+name: Dependency Scan (SCA)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install Dependency Check
+      run: |
+        wget https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.1/dependency-check-8.4.1-release.zip
+        unzip dependency-check-8.4.1-release.zip
+
+    - name: Run Scan
+      run: |
+        ./dependency-check/bin/dependency-check.sh \
+        --project "secure-devops" \
+        --scan . \
+        --format HTML
