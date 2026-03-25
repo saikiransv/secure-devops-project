@@ -19,14 +19,21 @@ jobs:
 
     - name: Run Scan
       run: |
+        mkdir reports
         ./dependency-check/bin/dependency-check.sh \
         --project "secure-devops" \
         --scan . \
         --format HTML \
         --out reports
 
+    # 🔍 DEBUG STEP (IMPORTANT)
+    - name: List files
+      run: |
+        echo "Files in reports folder:"
+        ls -la reports
+
     - name: Upload Report
       uses: actions/upload-artifact@v4
       with:
         name: dependency-report
-        path: reports
+        path: reports/
