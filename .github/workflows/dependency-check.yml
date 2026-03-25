@@ -23,3 +23,9 @@ jobs:
         --project "secure-devops" \
         --scan . \
         --format HTML
+
+    - name: Upload Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: dependency-report
+        path: dependency-check-report.html
