@@ -17,7 +17,7 @@ jobs:
         wget https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.1/dependency-check-8.4.1-release.zip
         unzip dependency-check-8.4.1-release.zip
 
-    - name: Run Scan
+    - name: Run Dependency Scan
       run: |
         mkdir reports
         ./dependency-check/bin/dependency-check.sh \
@@ -26,13 +26,12 @@ jobs:
         --format HTML \
         --out reports
 
-    # 🔍 DEBUG STEP (IMPORTANT)
-    - name: List files
+    - name: List Generated Files (Debug)
       run: |
         echo "Files in reports folder:"
         ls -la reports
 
-    - name: Upload Report
+    - name: Upload Dependency Report
       uses: actions/upload-artifact@v4
       with:
         name: dependency-report
