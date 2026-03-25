@@ -22,10 +22,11 @@ jobs:
         ./dependency-check/bin/dependency-check.sh \
         --project "secure-devops" \
         --scan . \
-        --format HTML
+        --format HTML \
+        --out reports
 
     - name: Upload Report
       uses: actions/upload-artifact@v4
       with:
         name: dependency-report
-        path: dependency-check-report.html
+        path: reports
