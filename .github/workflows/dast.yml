@@ -1,0 +1,14 @@
+name: DAST Scan (ZAP)
+
+on:
+  push:
+
+jobs:
+  zap:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: ZAP Scan
+      uses: zaproxy/action-baseline@v0.11.0
+      with:
+        target: 'https://sandee-nonpermitted-uncontemningly.ngrok-free.dev'
