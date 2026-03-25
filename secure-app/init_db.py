@@ -3,17 +3,22 @@ import sqlite3
 conn = sqlite3.connect("users.db")
 cursor = conn.cursor()
 
+# ✅ FIX: create table only if not exists
 cursor.execute("""
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT,
     password TEXT
 )
 """)
 
-cursor.execute("INSERT INTO users VALUES (1, 'admin', 'admin123')")
+# Optional: clear old data (for clean run)
+cursor.execute("DELETE FROM users")
+
+# Insert fresh data
+cursor.execute("INSERT INTO users (username, password) VALUES ('admin', 'admin123')")
 
 conn.commit()
 conn.close()
 
-print("DB created")
+print("Database ready")
