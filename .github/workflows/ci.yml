@@ -4,7 +4,7 @@ permissions:
   contents: read
   actions: write
   checks: write
-  id-token: write   # ✅ REQUIRED FIX
+  id-token: write
 
 on:
   push:
@@ -98,19 +98,20 @@ jobs:
         run: chmod -R 777 .
 
       - name: Run ZAP Scan
-        uses: zaproxy/action-baseline@v0.11.0
-        with:
-          target: 'https://sandee-nonpermitted-uncontemningly.ngrok-free.dev'
-          fail_action: false
+        run: |
+          docker run --rm \
+          -v $(pwd):/zap/wrk/:rw \
+          --network=host \
+          ghcr.io/zaproxy/zaproxy:stable \
+          zap-baseline.py \
+          -t https://sandee-nonpermitted-uncontemningly.ngrok-free.dev \
+          -r report_html.html
 
-      - name: Upload ZAP Report
-        uses: actions/upload-artifact@v4   # ✅ latest version
-        with:
-          name: zap-report
-          path: |
-            report_html.html
-            report_json.json
-            report_md.md
+      # ✅ SHOW REPORT IN LOGS
+      - name: Display Report Summary
+        run: |
+          echo "===== ZAP REPORT ====="
+          cat report_html.html || echo "Report not found"
 
   deploy:
     runs-on: ubuntu-latest
