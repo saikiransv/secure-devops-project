@@ -4,8 +4,12 @@ import os
 
 app = Flask(__name__)
 
-# ✅ Secure secret
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "default_key")
+# ✅ Secure: NO hardcoded fallback
+# Will crash if SECRET_KEY is not set (good security practice)
+try:
+    app.config['SECRET_KEY'] = os.environ["SECRET_KEY"]
+except KeyError:
+    raise RuntimeError("❌ SECRET_KEY environment variable not set!")
 
 def get_db():
     return sqlite3.connect("users.db")
@@ -21,12 +25,12 @@ def login():
 
     # ✅ Input validation
     if not username.isalnum() or not password.isalnum():
-        return "Invalid input"
+        return "Invalid input", 400
 
     conn = get_db()
     cursor = conn.cursor()
 
-    # ✅ Safe query
+    # ✅ Parameterized query (prevents SQL Injection)
     cursor.execute(
         "SELECT * FROM users WHERE username=? AND password=?",
         (username, password)
@@ -36,9 +40,10 @@ def login():
     conn.close()
 
     if user:
-        return "Login successful"
+        return "Login successful", 200
     else:
-        return "Invalid credentials"
+        return "Invalid credentials", 401
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    # ✅ Debug OFF in production
+    app.run(host="0.0.0.0", port=5000, debug=False)
