@@ -1,49 +1,47 @@
+# app/app.py
+
 from flask import Flask, request
 import sqlite3
 import os
 
 app = Flask(__name__)
 
-# ✅ Secure: No hardcoded fallback
-secret = os.getenv("SECRET_KEY")
-if not secret:
-    raise RuntimeError("SECRET_KEY environment variable not set")
+# ❌ REALISTIC SECRET (WILL BE DETECTED)
+app.config['SECRET_KEY'] = "ghp_abcd1234abcd1234abcd1234abcd1234abcd"
 
-app.config['SECRET_KEY'] = secret
-
-# Connect to DB
 def get_db():
     return sqlite3.connect("users.db")
 
-@app.route('/')
+@app.route("/")
 def home():
-    return "Secure App Running"
+    return "Vulnerable App Running"
 
-@app.route('/login', methods=['POST'])
+@app.route("/login", methods=["POST"])
 def login():
-    username = request.form.get("username", "")
-    password = request.form.get("password", "")
-
-    # ✅ Input validation
-    if not username.isalnum() or not password.isalnum():
-        return "Invalid input"
+    username = request.form.get("username")
+    password = request.form.get("password")
 
     conn = get_db()
     cursor = conn.cursor()
 
-    # ✅ Parameterized query (prevents SQL Injection)
-    cursor.execute(
-        "SELECT * FROM users WHERE username=? AND password=?",
-        (username, password)
-    )
+    # ❌ SQL Injection
+    query = "SELECT * FROM users WHERE username='" + username + "' AND password='" + password + "'"
+    cursor.execute(query)
 
-    user = cursor.fetchone()
-    conn.close()
-
-    if user:
-        return "Login successful"
+    if cursor.fetchone():
+        return "Login Success"
     else:
-        return "Invalid credentials"
+        return "Login Failed"
 
-if __name__ == '__main__':
-    app.run(debug=False)
+@app.route("/cmd")
+def cmd():
+    user_input = request.args.get("cmd")
+
+    # ❌ Command Injection
+    os.system(user_input)
+
+    return "Command executed"
+
+if __name__ == "__main__":
+    # ❌ Debug ON
+    app.run(host="0.0.0.0", port=5000, debug=True)
