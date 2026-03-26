@@ -3,6 +3,7 @@ name: Secure DevOps Pipeline
 on:
   push:
     branches: ["main"]
+  workflow_dispatch:   # 🔥 allows manual trigger
 
 jobs:
   build:
@@ -43,7 +44,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Run Secret Scan (filesystem only)
+    - name: Run Secret Scan
       run: |
         docker run --rm \
         -v ${{ github.workspace }}:/repo \
@@ -71,6 +72,18 @@ jobs:
 
     - name: Run Dependency Scan
       run: pip-audit -r app/requirements.txt --strict
+
+  # 🔥 DAST (MANUAL ONLY)
+  dast:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'workflow_dispatch'   # ✅ only manual
+
+    steps:
+    - name: Run OWASP ZAP Scan
+      uses: zaproxy/action-baseline@v0.11.0
+      with:
+        target: 'https://sandee-nonpermitted-uncontemningly.ngrok-free.dev'
 
   deploy:
     runs-on: ubuntu-latest
