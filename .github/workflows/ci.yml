@@ -2,7 +2,7 @@ name: Secure DevOps Pipeline
 
 permissions:
   contents: read
-  actions: read
+  actions: write
   checks: write
 
 on:
@@ -41,7 +41,7 @@ jobs:
       - name: Install Semgrep
         run: pip install semgrep
 
-      - name: Run SAST Scan (STRICT & CONTROLLED)
+      - name: Run SAST Scan
         run: |
           semgrep --config=p/owasp-top-ten \
                   --config=p/python \
@@ -102,8 +102,9 @@ jobs:
           target: 'https://sandee-nonpermitted-uncontemningly.ngrok-free.dev'
           fail_action: false
 
+      # ✅ FIXED (v3 instead of v4)
       - name: Upload ZAP Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: zap-report
           path: |
