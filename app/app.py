@@ -6,42 +6,45 @@ import os
 
 app = Flask(__name__)
 
-# ❌ Hardcoded secret (secret-scan FAIL)
-app.config['SECRET_KEY'] = "ghp_abcd1234verylongsecrettokenxyz"
+# ✅ Secure secret (no hardcoding)
+secret = os.getenv("SECRET_KEY")
+if not secret:
+    raise RuntimeError("SECRET_KEY not set")
+
+app.config['SECRET_KEY'] = secret
 
 def get_db():
     return sqlite3.connect("users.db")
 
 @app.route("/")
 def home():
-    return "Vulnerable App Running"
+    return "Secure App Running"
 
 @app.route("/login", methods=["POST"])
 def login():
-    username = request.form.get("username")
-    password = request.form.get("password")
+    username = request.form.get("username", "")
+    password = request.form.get("password", "")
+
+    # ✅ Input validation
+    if not username.isalnum() or not password.isalnum():
+        return "Invalid input", 400
 
     conn = get_db()
     cursor = conn.cursor()
 
-    # ❌ SQL Injection (SAST FAIL)
-    query = f"SELECT * FROM users WHERE username='{username}' AND password='{password}'"
-    cursor.execute(query)
+    # ✅ SAFE query (prevents SQL injection)
+    cursor.execute(
+        "SELECT * FROM users WHERE username=? AND password=?",
+        (username, password)
+    )
 
-    if cursor.fetchone():
-        return "Login Success"
+    user = cursor.fetchone()
+    conn.close()
+
+    if user:
+        return "Login successful"
     else:
-        return "Login Failed"
-
-@app.route("/cmd")
-def cmd():
-    user_input = request.args.get("cmd")
-
-    # ❌ Command Injection (SAST FAIL)
-    os.system(user_input)
-
-    return "Command executed"
+        return "Invalid credentials"
 
 if __name__ == "__main__":
-    # ❌ Debug ON (SAST FAIL)
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)
