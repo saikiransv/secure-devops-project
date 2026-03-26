@@ -13,5 +13,6 @@ jobs:
     - name: Install Semgrep
       run: pip install semgrep
 
-    - name: Run Scan
-      run: semgrep --config=auto app/
+    - name: Run Semgrep and FAIL if issues found
+      run: |
+        semgrep --config=auto app/ --error
