@@ -5,32 +5,35 @@ on:
   pull_request:
 
 jobs:
-  dependency-check:
+  dependency-scan:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Install Dependency Check
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install pip-audit
+      run: pip install pip-audit
+
+    - name: Install dependencies
       run: |
-        wget https://github.com/jeremylong/DependencyCheck/releases/download/v7.4.4/dependency-check-7.4.4-release.zip
-        unzip dependency-check-7.4.4-release.zip
+        cd vulnerable-app
+        pip install -r requirements.txt
 
     - name: Run Dependency Scan
       run: |
-        mkdir reports
-        ./dependency-check/bin/dependency-check.sh \
-        --project "secure-devops" \
-        --scan . \
-        --format HTML \
-        --out reports \
-        --disableAssembly \
-        --disableNodeJS \
-        --failOnCVSS 11
+        pip-audit -r vulnerable-app/requirements.txt > report.txt
 
-    - name: Upload Dependency Report
+    - name: Show Report
+      run: cat report.txt
+
+    - name: Upload Report
       uses: actions/upload-artifact@v4
       with:
         name: dependency-report
-        path: reports/
+        path: report.txt
