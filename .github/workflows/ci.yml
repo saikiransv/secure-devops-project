@@ -88,17 +88,28 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    # ✅ FIX: allow docker to write files
+    - name: Fix permissions
+      run: chmod -R 777 .
+
     - name: Run ZAP Scan
       uses: zaproxy/action-baseline@v0.11.0
       with:
-        target: 'https://your-ngrok-url.ngrok-free.dev'
+        target: 'https://sandee-nonpermitted-uncontemningly.ngrok-free.dev'
         fail_action: false
+
+    # ✅ Upload HTML report
+    - name: Upload ZAP Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: zap-report
+        path: report_html.html
 
   deploy:
     runs-on: ubuntu-latest
     needs: [build, sast, secret-scan, dependency-scan]
     if: success()
-    environment: production   # ✅ ADDED (for approval)
+    environment: production
 
     steps:
     - name: Deploy
