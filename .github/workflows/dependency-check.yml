@@ -26,13 +26,13 @@ jobs:
         --format HTML \
         --out reports
 
-    - name: List Generated Files (Debug)
+    - name: Debug - List Files
       run: |
-        echo "Files in reports folder:"
-        ls -la reports
+        echo "Checking reports folder:"
+        ls -R
 
-    - name: Upload Dependency Report
+    - name: Upload Report
       uses: actions/upload-artifact@v4
       with:
         name: dependency-report
-        path: reports/
+        path: reports
