@@ -1,3 +1,5 @@
+# Secure Flask App with Fixed Vulnerabilities
+
 from flask import Flask, request
 import sqlite3
 import os
