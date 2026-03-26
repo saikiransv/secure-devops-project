@@ -4,6 +4,7 @@ permissions:
   contents: read
   actions: write
   checks: write
+  id-token: write   # ✅ REQUIRED FIX
 
 on:
   push:
@@ -102,9 +103,8 @@ jobs:
           target: 'https://sandee-nonpermitted-uncontemningly.ngrok-free.dev'
           fail_action: false
 
-      # ✅ FIXED (v3 instead of v4)
       - name: Upload ZAP Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4   # ✅ latest version
         with:
           name: zap-report
           path: |
