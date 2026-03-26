@@ -4,8 +4,8 @@ import os
 
 app = Flask(__name__)
 
-# ❌ Hardcoded secret (Secret Scan will detect)
-SECRET_KEY = "supersecret123"
+# ❌ Hardcoded secret (WILL trigger Secret Scan)
+app.config['SECRET_KEY'] = "super_secret_key_123456"
 
 def get_db():
     return sqlite3.connect("users.db")
@@ -22,7 +22,7 @@ def login():
     conn = get_db()
     cursor = conn.cursor()
 
-    # ❌ SQL Injection (SAST)
+    # ❌ SQL Injection (SAST will detect)
     query = f"SELECT * FROM users WHERE username='{username}' AND password='{password}'"
     cursor.execute(query)
 
@@ -35,11 +35,11 @@ def login():
 def cmd():
     user_input = request.args.get("cmd")
 
-    # ❌ Command Injection (SAST)
+    # ❌ Command Injection (SAST will detect)
     os.system(user_input)
 
     return "Command executed"
 
 if __name__ == "__main__":
-    # ❌ Debug enabled (SAST)
+    # ❌ Debug mode ON (SAST will detect)
     app.run(debug=True)
