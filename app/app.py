@@ -4,8 +4,12 @@ import os
 
 app = Flask(__name__)
 
-# ✅ Use environment variable (no hardcoded secret)
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "default_key")
+# ✅ Secure: No hardcoded fallback
+secret = os.getenv("SECRET_KEY")
+if not secret:
+    raise RuntimeError("SECRET_KEY environment variable not set")
+
+app.config['SECRET_KEY'] = secret
 
 # Connect to DB
 def get_db():
@@ -42,5 +46,4 @@ def login():
         return "Invalid credentials"
 
 if __name__ == '__main__':
-    # ❌ No debug mode
     app.run(debug=False)
