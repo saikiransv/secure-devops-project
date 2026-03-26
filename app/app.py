@@ -1,15 +1,16 @@
 from flask import Flask, request
 import sqlite3
 import os
+import secrets
 
 app = Flask(__name__)
 
-# ✅ Secure: NO hardcoded fallback
-# Will crash if SECRET_KEY is not set (good security practice)
-try:
-    app.config['SECRET_KEY'] = os.environ["SECRET_KEY"]
-except KeyError:
-    raise RuntimeError("❌ SECRET_KEY environment variable not set!")
+# ✅ Secure + Portable Secret Key Handling
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
+
+if not app.config['SECRET_KEY']:
+    # Generate random secure key (NOT hardcoded)
+    app.config['SECRET_KEY'] = secrets.token_hex(32)
 
 def get_db():
     return sqlite3.connect("users.db")
@@ -45,5 +46,4 @@ def login():
         return "Invalid credentials", 401
 
 if __name__ == "__main__":
-    # ✅ Debug OFF in production
     app.run(host="0.0.0.0", port=5000, debug=False)
