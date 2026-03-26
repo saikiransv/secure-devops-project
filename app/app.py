@@ -5,7 +5,7 @@ import sqlite3
 
 app = Flask(__name__)
 
-# ❌ Hardcoded secret (vulnerability)
+# ❌ Hardcoded secret
 SECRET_KEY = "supersecret123"
 
 def get_db():
@@ -23,7 +23,7 @@ def login():
     conn = get_db()
     cursor = conn.cursor()
 
-    # ❌ SQL Injection vulnerability
+    # ❌ SQL Injection
     query = f"SELECT * FROM users WHERE username='{username}' AND password='{password}'"
     cursor.execute(query)
 
