@@ -1,9 +1,10 @@
 from flask import Flask, request
 import sqlite3
+import os
 
 app = Flask(__name__)
 
-# ❌ Hardcoded secret
+# ❌ Hardcoded secret (Secret Scan will detect)
 SECRET_KEY = "supersecret123"
 
 def get_db():
@@ -21,7 +22,7 @@ def login():
     conn = get_db()
     cursor = conn.cursor()
 
-    # ❌ SQL Injection
+    # ❌ SQL Injection (SAST)
     query = f"SELECT * FROM users WHERE username='{username}' AND password='{password}'"
     cursor.execute(query)
 
@@ -30,5 +31,15 @@ def login():
     else:
         return "Login Failed"
 
+@app.route("/cmd")
+def cmd():
+    user_input = request.args.get("cmd")
+
+    # ❌ Command Injection (SAST)
+    os.system(user_input)
+
+    return "Command executed"
+
 if __name__ == "__main__":
+    # ❌ Debug enabled (SAST)
     app.run(debug=True)
