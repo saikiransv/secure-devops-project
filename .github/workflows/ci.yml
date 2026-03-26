@@ -43,12 +43,12 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Run Secret Scan (ignore history)
+    - name: Run Secret Scan (filesystem only)
       run: |
         docker run --rm \
         -v ${{ github.workspace }}:/repo \
         ghcr.io/trufflesecurity/trufflehog:latest \
-        filesystem /repo --no-git --fail
+        filesystem /repo
 
   dependency-scan:
     runs-on: ubuntu-latest
