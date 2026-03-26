@@ -1,34 +1,46 @@
 from flask import Flask, request
 import sqlite3
+import os
 
 app = Flask(__name__)
 
-# ❌ Hardcoded secret (vulnerability)
-SECRET_KEY = "supersecret123"
+# ✅ Use environment variable (no hardcoded secret)
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "default_key")
 
+# Connect to DB
 def get_db():
     return sqlite3.connect("users.db")
 
-@app.route("/")
+@app.route('/')
 def home():
-    return "Vulnerable App Running"
+    return "Secure App Running"
 
-@app.route("/login", methods=["POST"])
+@app.route('/login', methods=['POST'])
 def login():
-    username = request.form.get("username")
-    password = request.form.get("password")
+    username = request.form.get("username", "")
+    password = request.form.get("password", "")
+
+    # ✅ Input validation
+    if not username.isalnum() or not password.isalnum():
+        return "Invalid input"
 
     conn = get_db()
     cursor = conn.cursor()
 
-    # ❌ SQL Injection vulnerability
-    query = f"SELECT * FROM users WHERE username='{username}' AND password='{password}'"
-    cursor.execute(query)
+    # ✅ Parameterized query (prevents SQL Injection)
+    cursor.execute(
+        "SELECT * FROM users WHERE username=? AND password=?",
+        (username, password)
+    )
 
-    if cursor.fetchone():
-        return "Login Success"
+    user = cursor.fetchone()
+    conn.close()
+
+    if user:
+        return "Login successful"
     else:
-        return "Login Failed"
+        return "Invalid credentials"
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    # ❌ No debug mode
+    app.run(debug=False)
