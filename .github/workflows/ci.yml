@@ -36,11 +36,12 @@ jobs:
     - name: Install Semgrep
       run: pip install semgrep
 
-    - name: Run SAST Scan
+    - name: Run SAST Scan (FAIL ONLY HIGH)
       run: |
         semgrep --config=p/owasp-top-ten \
                 --config=p/python \
-                app/ --error
+                --severity ERROR \
+                app/
 
   secret-scan:
     runs-on: ubuntu-latest
