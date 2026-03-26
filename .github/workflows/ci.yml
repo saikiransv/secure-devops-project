@@ -38,18 +38,18 @@ jobs:
       run: semgrep --config=auto app/ --error
 
   secret-scan:
-    runs-on: ubuntu-latest
-    needs: build
+  runs-on: ubuntu-latest
+  needs: build
 
-    steps:
-    - uses: actions/checkout@v3
+  steps:
+  - uses: actions/checkout@v3
 
-    - name: Run Secret Scan
-      run: |
-        docker run --rm \
-        -v ${{ github.workspace }}:/repo \
-        ghcr.io/trufflesecurity/trufflehog:latest \
-        filesystem /repo
+  - name: Run Secret Scan (STRICT MODE)
+    run: |
+      docker run --rm \
+      -v ${{ github.workspace }}:/repo \
+      ghcr.io/trufflesecurity/trufflehog:latest \
+      filesystem /repo --fail --only-verified
 
   dependency-scan:
     runs-on: ubuntu-latest
