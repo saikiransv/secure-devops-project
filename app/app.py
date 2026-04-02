@@ -5,19 +5,26 @@ import os
 app = Flask(__name__)
 
 # ✅ Secure: No hardcoded fallback
-secret = os.getenv("SECRET_KEY")
-if not secret:
-    raise RuntimeError("SECRET_KEY environment variable not set")
+# secret = os.getenv("SECRET_KEY")
+# if not secret:
+#     raise RuntimeError("SECRET_KEY environment variable not set")
 
-app.config['SECRET_KEY'] = secret
+# app.config['SECRET_KEY'] = secret
 
 # Connect to DB
 def get_db():
     return sqlite3.connect("users.db")
 
-@app.route('/')
+@app.route("/")
 def home():
-    return "Secure App Running"
+    return """
+    <h1>Secure DevOps Project</h1>
+
+    <a href="/dashboard" target="_blank">
+        <button>Open Dashboard</button>
+    </a>
+    """
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -39,6 +46,25 @@ def login():
 
     user = cursor.fetchone()
     conn.close()
+
+
+@app.route("/dashboard")
+def dashboard():
+    return """
+    <h1>Security Dashboard</h1>
+    <button onclick="loadData()">Load Reports</button>
+
+    <pre id="output"></pre>
+
+    <script>
+    async function loadData() {
+        const data = await fetch('/api/sast').then(r => r.json());
+        document.getElementById('output').innerText =
+            JSON.stringify(data, null, 2);
+    }
+    </script>
+    """
+
 
     if user:
         return "Login successful"
