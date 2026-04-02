@@ -5,12 +5,12 @@ import json
 
 app = Flask(__name__)
 
-# SECRET KEY (secure)
-secret = os.getenv("SECRET_KEY")
-if not secret:
-    raise RuntimeError("SECRET_KEY environment variable not set")
+# # SECRET KEY (secure)
+# secret = os.getenv("SECRET_KEY")
+# if not secret:
+#     raise RuntimeError("SECRET_KEY environment variable not set")
 
-app.config['SECRET_KEY'] = secret
+# app.config['SECRET_KEY'] = secret
 
 # DB connection
 def get_db():
