@@ -4,12 +4,12 @@ import os
 
 app = Flask(__name__)
 
-# ✅ Secure: No hardcoded fallback
-secret = os.getenv("SECRET_KEY")
-if not secret:
-    raise RuntimeError("SECRET_KEY environment variable not set")
+# # ✅ Secure: No hardcoded fallback
+# secret = os.getenv("SECRET_KEY")
+# if not secret:
+#     raise RuntimeError("SECRET_KEY environment variable not set")
 
-app.config['SECRET_KEY'] = secret
+# app.config['SECRET_KEY'] = secret
 
 # Connect to DB
 def get_db():
